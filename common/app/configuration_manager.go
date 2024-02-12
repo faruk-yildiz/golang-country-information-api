@@ -16,8 +16,8 @@ func NewConfigurationManager() *ConfigurationManager {
 func getPostgreConfig() postgre.Config {
 	return postgre.Config{
 		Host:                  "localhost",
-		Port:                  "6432",
-		DbName:                "productapp",
+		Port:                  "7432",
+		DbName:                "countryinfoapp",
 		UserName:              "postgres",
 		Password:              "postgres",
 		MaxConnections:        "10",
