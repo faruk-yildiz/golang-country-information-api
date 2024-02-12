@@ -1,11 +1,13 @@
 package domain
 
+import "database/sql"
+
 type Country struct {
 	Id        int64
-	Iso       string
+	Iso       sql.NullString
 	Name      string
 	NiceName  string
-	Iso3      string
-	Numcode   int
-	PhoneCode int
+	Iso3      sql.NullString
+	NumCode   sql.NullInt32
+	PhoneCode sql.NullInt32
 }
