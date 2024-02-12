@@ -1,10 +1,12 @@
 package dto
 
-type CountryDto struct {
-	Iso       string `json:"iso"`
-	Name      string `json:"name"`
-	NiceName  string `json:"niceName"`
-	Iso3      string `json:"iso3"`
-	Numcode   int    `json:"numcode"`
-	PhoneCode int    `json:"phoneCode"`
+import "database/sql"
+
+type UpdateOrAddCountryDto struct {
+	Iso       sql.NullString `json:"iso"`
+	Name      string         `json:"name"`
+	NiceName  string         `json:"niceName"`
+	Iso3      sql.NullString `json:"iso3"`
+	NumCode   sql.NullInt32  `json:"numcode"`
+	PhoneCode sql.NullInt32  `json:"phoneCode"`
 }
