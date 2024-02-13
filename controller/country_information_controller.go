@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"country_information_api/dto"
 	"country_information_api/dto/response"
 	"country_information_api/service"
 	"github.com/labstack/echo/v4"
@@ -26,9 +25,6 @@ func (countryController *CountryController) RegisterRoutes(e *echo.Echo) {
 	e.GET("/api/v1/countries/iso2", countryController.GetCountryByIso2)
 	e.GET("/api/v1/countries/iso3", countryController.GetCountryByIso3)
 	e.GET("/api/v1/countries/phonecode", countryController.GetCountryByPhoneCode)
-	e.POST("/api/v1/countries", countryController.AddCountry)
-	e.PUT("/api/v1/countries/:id", countryController.UpdateCountry)
-	e.DELETE("/api/v1/countries/:id", countryController.DeleteProduct)
 }
 
 func (countryController *CountryController) GetAllCountries(e echo.Context) error {
@@ -99,55 +95,4 @@ func (countryController *CountryController) GetCountryByPhoneCode(e echo.Context
 	}
 
 	return e.JSON(http.StatusOK, country)
-}
-
-func (countryController *CountryController) AddCountry(e echo.Context) error {
-	var addCountryRequestObject dto.UpdateOrAddCountryDto
-	err := e.Bind(&addCountryRequestObject)
-
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, response.ErrorResponse{ErrorDescription: err.Error()})
-	}
-	addCountryErr := countryController.countryService.AddCountry(addCountryRequestObject)
-
-	if addCountryErr != nil {
-		return e.JSON(http.StatusBadRequest, response.ErrorResponse{ErrorDescription: err.Error()})
-	}
-	return e.NoContent(http.StatusCreated)
-}
-
-func (countryController *CountryController) UpdateCountry(e echo.Context) error {
-	param := e.Param("id")
-	countryIdInt, convertError := strconv.Atoi(param)
-	countryId := int64(countryIdInt)
-
-	if convertError != nil {
-		return e.NoContent(http.StatusBadRequest)
-	}
-
-	var addCountryRequestObject dto.UpdateOrAddCountryDto
-	err := e.Bind(&addCountryRequestObject)
-
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, response.ErrorResponse{ErrorDescription: err.Error()})
-	}
-	updateCountryError := countryController.countryService.UpdateCountryById(addCountryRequestObject, countryId)
-
-	if updateCountryError != nil {
-		return e.JSON(http.StatusBadRequest, response.ErrorResponse{ErrorDescription: err.Error()})
-	}
-	return e.NoContent(http.StatusOK)
-}
-
-func (countryController *CountryController) DeleteProduct(e echo.Context) error {
-	param := e.Param("id")
-	atoi, _ := strconv.Atoi(param)
-	countryId := int64(atoi)
-
-	err := countryController.countryService.DeleteCountryById(countryId)
-
-	if err != nil {
-		return e.JSON(http.StatusNotFound, response.ErrorResponse{err.Error()})
-	}
-	return e.NoContent(http.StatusOK)
 }

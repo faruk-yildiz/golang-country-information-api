@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"country_information_api/domain"
-	"country_information_api/dto"
 	"country_information_api/dto/response"
 	"errors"
 	"fmt"
@@ -21,9 +20,6 @@ type ICountryInformationRepository interface {
 	GetCountryByIso2(iso2 string) (response.CountryResponseDto, error)
 	GetCountryByIso3(iso3 string) (response.CountryResponseDto, error)
 	GetCountryByPhoneCode(phoneCode int) (response.CountryResponseDto, error)
-	AddCountry(country dto.UpdateOrAddCountryDto) error
-	UpdateCountryById(country dto.UpdateOrAddCountryDto, countryId int64) error
-	DeleteCountryById(countryId int64) error
 }
 
 type CountryInformationRepository struct {
@@ -148,53 +144,6 @@ func (c *CountryInformationRepository) GetCountryByPhoneCode(phoneCode int) (res
 	}
 
 	return country, nil
-}
-
-func (c *CountryInformationRepository) AddCountry(country dto.UpdateOrAddCountryDto) error {
-	ctx = context.Background()
-	addCountrySql := `Insert into countries (iso,name,nicename,iso3,numcode,phonecode) values ($1,$2,$3,$4,&5,&6)`
-
-	addNewCountry, err := c.dbPool.Exec(ctx, addCountrySql, country.Iso, country.Name, country.NiceName, country.Iso3, country.NumCode, country.PhoneCode)
-	if err != nil {
-		log.Errorf("Error when adding country to table", err)
-		return err
-	}
-	log.Info(fmt.Printf("Country added %v", addNewCountry))
-	return nil
-}
-
-func (c *CountryInformationRepository) UpdateCountryById(country dto.UpdateOrAddCountryDto, countryId int64) error {
-	ctx = context.Background()
-
-	updateSql := `Update countries set iso = $1,name=$2,nicename=&3,iso3=&4,numcode=&5,phonecode=&6, where id=$7`
-
-	_, err := c.dbPool.Exec(ctx, updateSql, country.Iso, strings.ToUpper(country.Name), country.Iso3, country.NumCode, country.PhoneCode, countryId)
-
-	if err != nil {
-		return errors.New(fmt.Sprintf("Error while updating with id : %d", countryId))
-	}
-	log.Info("Product price updated with id %v", countryId)
-	return nil
-}
-
-func (c *CountryInformationRepository) DeleteCountryById(countryId int64) error {
-	ctx = context.Background()
-	_, err := c.GetCountryById(countryId)
-
-	if err != nil {
-		return errors.New("Country Not Found")
-	}
-
-	deleteCountrySql := `Delete from countries where id=$1`
-
-	_, err = c.dbPool.Exec(ctx, deleteCountrySql, countryId)
-
-	if err != nil {
-		log.Errorf("Error when deleting product ", err)
-		return errors.New(fmt.Sprintf("Error while deleting country"))
-	}
-	log.Info(fmt.Printf("country deleted "))
-	return nil
 }
 
 func validateDbResponse(countryTemp *domain.Country, country *response.CountryResponseDto) response.CountryResponseDto {
